@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Playing with Backbone.js and Google Maps</title>
+  <link rel="stylesheet" type="text/css" href="/bootstrap/css/bootstrap.min.css">
+</head>
+ <body>
+<div class="container">
+  
+  <div id="progres-bar" class="row">
+      <div class="span12 well">
+      <span id="progress-text" style="margin-bottom: 10px;" class="badge badge-important">6</span>
+        <div class="progress">
+          <div  class="bar bar-danger" style="width: 0"></div>
+        </div>
+      </div>
+  </div>
+  <div class="row">
+      <div class="span12">
+        <a href id="start" class="btn">start</a>
+      </div>
+  </div>
+
+</div>
+
+  <script src="app/vendor/jquery-1.7.1.js"></script>
+
+  <script src="socket.io/socket.io.js"></script>
+  <script type="text/javascript">
+
+$(function() {
+    $('#start').click(function(){
+        if ($(this).hasClass('disabled')) return false;
+
+        $.post('/start', function(res){
+            $('#progres-bar').show();
+            $('#start').addClass('disabled');
+        });
+        return false;
+    });
+
+    var socket = io.connect('http://localhost:3000');
+    socket.on('progress', function(progress){
+        $('#progress').html(progress);
+        $('.progress .bar').css('width', progress + '%');
+        $('#progress-text').html(progress + ' %');
+
+        if (progress == 100){
+            setTimeout(function(){
+                $('.progress .bar').css('width', '0');
+                $('#progres-bar').hide();
+                $('#start').removeClass('disabled');
+            }, 1000);
+        }
+    });
+
+    $('#progres-bar').hide();
+})
+  </script>
+</body>
+</html>
